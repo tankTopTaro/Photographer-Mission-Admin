@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { AdminContext } from '../context/AdminContext'
 import axios from 'axios'
+import axiosClient from '../api/axiosClient'
 
 const AlbumUsersForm = ({setAlertMsg}) => {
     const { availableRemotes, fetchAdmin } = useContext(AdminContext)
@@ -23,7 +24,7 @@ const AlbumUsersForm = ({setAlertMsg}) => {
         //const formDataObj = Object.fromEntries(formData.entries())
 
         try {
-            const response = await axios.post('http://localhost:8000/api/photographer-store', formData)
+            const response = await axiosClient.post(`/photographer-store`, formData)
             setAlertMsg(response.data.message)
             event.target.reset()
             await fetchAdmin()

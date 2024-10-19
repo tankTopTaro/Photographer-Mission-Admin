@@ -1,11 +1,20 @@
 import React, { useContext, useState } from 'react'
 import { AdminContext } from '../context/AdminContext'
-import axios from 'axios'
 import axiosClient from '../api/axiosClient'
+import CryptoJS from 'crypto-js'
 
 const AddUserToAlbum = ({setAlertMsg}) => {
     const { albumOwners, fetchAdmin } = useContext(AdminContext)
     const [submitting, setSubmitting] = useState(false)
+
+    const generateToken = (albumId) => {
+        const salt = 'SALT123'
+        const randomNum = Math.floor(Math.random() * 10000)
+        const tokenString = salt + albumId + randomNum
+
+        const hashedToken = CryptoJS.SHA256(tokenString).toString()
+        return hashedToken
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -14,8 +23,13 @@ const AddUserToAlbum = ({setAlertMsg}) => {
         setSubmitting(true)
 
         const formData = new FormData(event.target)
-        // const formDataObj = Object.fromEntries(formData.entries())
-        // console.log('Form Data Object:', formDataObj);
+        const albumId = formData.get('album_id')
+
+        const token = generateToken(albumId)
+
+        formData.append('token', token)
+
+        // Generate a token with SALT123 + albumId + random number range to 10000
 
         try {
             const response = await axiosClient.post('/photographer-invite', formData)
